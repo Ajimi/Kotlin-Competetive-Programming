@@ -2,30 +2,79 @@ fun main(args: Array<String>) {
     val size = readLine()!!.toInt()
     val list = readLine()!!.split(" ").map { it.toInt() }.toList()
 
-    var pairsList = mutableListOf<Pair<Int, Int>>()
 
-    (0..list.size - 1).forEach {
-        pairsList.add(Pair(it, 1))
+    var max = 0
+    list.forEachIndexed { index, element ->
+        var (right, left) = getRightAndLeft(index)
+
+        var sumLeft = 0
+        var currentLeft = 0
+        var canGoLeft: Boolean = false
+
+        if (index == 0) {
+            canGoLeft = false
+        } else {
+            currentLeft = list[left]
+            canGoLeft = leftable(left, element, currentLeft)
+        }
+
+        while (canGoLeft) {
+            sumLeft++
+            if (left >= 0)
+                currentLeft = list[left]
+            left--
+            if (left == -1)
+                canGoLeft = false
+            else
+                canGoLeft = leftable(left, currentLeft, list[left])
+        }
+
+        var sumRight = 0
+        var canGoRight = false
+        var currentRight = 0
+
+        if (index == size - 1)
+            canGoRight = false
+        else {
+            currentRight = list[right]
+            canGoRight = rightable(right, size, element, currentRight)
+        }
+
+
+        while (canGoRight) {
+            sumRight++
+            if (right < size)
+                currentRight = list[right]
+            right++
+            if (right == size)
+                canGoRight = false
+            else
+                canGoRight = rightable(right, size, currentRight, list[right])
+
+        }
+
+        if (sumRight + sumLeft > max) {
+            max = sumRight + sumLeft
+        }
+        if (max == size - 1) {
+            return@forEachIndexed
+        }
+
     }
 
-    (1..list.size - 2).forEach {
-        var sum = 0
-        val current = list[it]
-        val prev = list[it - 1]
-        val next = list[it + 1]
-        if (current >= prev)
-            sum++
-//            sum += pairsList[it - 1].second
+    print(max + 1)
 
-        if (current >= next)
-            sum++
-//            sum += pairsList[it + 1].second
-        pairsList[it] = Pair(it, sum)
-    }
-
-    print(pairsList)
-//    print(pairsList.maxBy { it.second })
-}
 //
-//8
-// 1 2 1 1 1 3 3 4
+}
+
+
+private fun leftable(left: Int, element: Int, item: Int) =
+        (left >= 0 && element >= item)
+
+private fun rightable(right: Int, size: Int, element: Int, item: Int) =
+        (right < size && element >= item)
+
+
+fun getRightAndLeft(index: Int): Pair<Int, Int> {
+    return Pair(index + 1, index - 1)
+}
