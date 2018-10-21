@@ -1,0 +1,92 @@
+import java.util.*
+import kotlin.math.abs
+
+val counts = mutableListOf<Pair<Int, Int>>() // (odd, even)
+val cuts = mutableListOf<Int>() // Price
+
+fun main(args: Array<String>) {
+
+
+    val data = mutableListOf<Int>()
+
+
+    val reader = Scanner(System.`in`)
+    var iterations: Int = reader.nextInt()
+    var bitcoins: Int = reader.nextInt()
+
+    for (i in 0..iterations - 1) {
+        val number = reader.nextInt()
+        data.add(number)
+        createCount(number, i)
+    }
+
+
+    for (i in 1..iterations - 2) {
+        if (isCuttable(counts.get(i))) {
+            val price = absValue(data[i], data[i + 1])
+            cuts.add(price)
+        }
+    }
+
+    var count = 0
+    var cutValue = 0
+    cuts.sorted().forEach {
+        cutValue += it
+        if (bitcoins - cutValue >= 0)
+            count++
+    }
+
+    print(count)
+
+
+}
+
+fun isCuttable(pairs: Pair<Int, Int>): Boolean {
+    return pairs.first == pairs.second
+}
+
+fun createCount(number: Int, index: Int) {
+
+    val even = isEven(number)
+
+    if (index == 0) {
+        addToCount(even, Pair(0, 0))
+        return
+    }
+    addToCount(even, counts.get(index - 1))
+}
+
+
+fun addToCount(even: Boolean, pair: Pair<Int, Int>) {
+    val (oddNumber, evenNumber) = pair
+    if (even) {
+        addToCount(oddNumber, evenNumber + 1)
+    } else {
+        addToCount(oddNumber + 1, evenNumber)
+    }
+}
+
+
+fun addToCount(oddNumber: Int, evenNumber: Int) {
+    add(counts, Pair(oddNumber, evenNumber))
+}
+
+
+fun add(list: MutableList<Pair<Int, Int>>, pairs: Pair<Int, Int>) {
+    list.add(pairs)
+}
+
+
+fun isEven(x: Int): Boolean {
+    return x % 2 == 0;
+}
+
+fun absValue(x: Int, y: Int): Int {
+    return abs(x - y);
+}
+
+
+            15
+      10            14
+    7    9       11     13
+  1  4  8  2    6  5  12
